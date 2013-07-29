@@ -495,20 +495,11 @@ handleKeyPress (DisplayInfo *display_info, XKeyEvent * ev)
             workspaceSwitch (ev_screen_info, ev_screen_info->current_ws - 1, NULL, TRUE, ev->time);
             break;
         case KEY_UP_WORKSPACE:
-            status = EVENT_FILTER_REMOVE;
-            workspaceMove(ev_screen_info, -1, 0, NULL, ev->time);
-            break;
         case KEY_DOWN_WORKSPACE:
-            status = EVENT_FILTER_REMOVE;
-            workspaceMove(ev_screen_info, 1, 0, NULL, ev->time);
-            break;
         case KEY_LEFT_WORKSPACE:
-            status = EVENT_FILTER_REMOVE;
-            workspaceMove(ev_screen_info, 0, -1, NULL, ev->time);
-            break;
         case KEY_RIGHT_WORKSPACE:
             status = EVENT_FILTER_REMOVE;
-            workspaceMove(ev_screen_info, 0, 1, NULL, ev->time);
+            workspaceSwitchInteractive(ev_screen_info, NULL, ev);
             break;
         case KEY_ADD_WORKSPACE:
             status = EVENT_FILTER_REMOVE;
