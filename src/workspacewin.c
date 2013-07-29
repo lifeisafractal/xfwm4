@@ -116,10 +116,50 @@ get_color (GtkWidget *win, GtkStateType state_type)
     return (&style->bg[state_type]);
 }
 
+static void
+wswinDraw (WswinWidget *wsw)
+{
+    cairo_t *cr;
+    GdkColor *bg_normal = get_color(GTK_WIDGET (wsw), GTK_STATE_NORMAL);
+    GdkColor *bg_selected = get_color(GTK_WIDGET (wsw), GTK_STATE_SELECTED);
+    gdouble width = GTK_WIDGET(wsw)->allocation.width;
+    gdouble height = GTK_WIDGET(wsw)->allocation.height;
+    gdouble x_size = width / wsw->cols;
+    gdouble y_size = height / wsw->rows;
+    gint row, col, current;
+
+    cr = gdk_cairo_create (GTK_WIDGET(wsw)->window);
+    if (G_UNLIKELY (cr == NULL))
+      return;
+
+    cairo_set_line_width (cr, 1);
+    cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+
+    cairo_rectangle(cr,0,0,width,height);
+    gdk_cairo_set_source_color(cr, bg_normal);
+    cairo_fill (cr);
+    for(row = 0; row < wsw->rows; row++)
+    {
+        for(col = 0; col < wsw->cols; col++)
+        {
+            current = (row * wsw->cols) + col;
+            if(current == wsw->selected)
+            {
+                g_print("now doing a workspace draw!\n");
+                g_print("Drawing %f, %f, %f %f\n",col*x_size, row*y_size, x_size, y_size);
+                cairo_rectangle(cr, col*x_size, row*y_size, x_size, y_size);
+                gdk_cairo_set_source_color(cr, bg_selected);
+                cairo_fill (cr);
+            }
+        }
+    }
+
+    cairo_destroy (cr);
+}
+
 static gboolean
 wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
 {
-    g_print("in expose\n");
     cairo_t *cr;
     GdkColor *bg_normal = get_color(wsw, GTK_STATE_NORMAL);
     GdkColor *bg_selected = get_color(wsw, GTK_STATE_SELECTED);
