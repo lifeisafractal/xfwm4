@@ -200,6 +200,10 @@ wswinCreateWidget (Wswin *wswin, ScreenInfo *screen_info, gint monitor_num)
     wsw->height = -1;
     wsw->monitor_num = monitor_num;
     wsw->wswin = wswin;
+    wsw->rows = screen_info->desktop_layout.rows;
+    wsw->cols = screen_info->desktop_layout.cols;
+    wsw->count = screen_info->workspace_count;
+    wsw->selected = screen_info->current_ws;
 
     gtk_window_set_screen (GTK_WINDOW (wsw), screen_info->gscr);
     gtk_widget_set_name (GTK_WIDGET (wsw), "xfwm4-wswin");
@@ -220,7 +224,7 @@ wswinCreateWidget (Wswin *wswin, ScreenInfo *screen_info, gint monitor_num)
     gtk_window_move (GTK_WINDOW(wsw), monitor.x + monitor.width / 2,
                                       monitor.y + monitor.height / 2);
     /* TODO: set the size to be a param */
-    gtk_window_set_default_size(GTK_WINDOW(wsw), 64*(screen_info->desktop_layout.cols), 40*(screen_info->desktop_layout.rows));
+    gtk_window_set_default_size(GTK_WINDOW(wsw), 64*(wsw->cols), 40*(wsw->rows));
 
     g_signal_connect_swapped (wsw, "configure-event",
                                   GTK_SIGNAL_FUNC (wswinConfigure), (gpointer) wsw);

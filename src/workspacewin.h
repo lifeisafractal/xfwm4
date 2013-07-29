@@ -57,6 +57,7 @@ struct _WswinWidget
     gint width, height;
     gint cols;
     gint rows;
+    gint count;
     gint selected;
 };
 
