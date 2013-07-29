@@ -32,9 +32,9 @@
 #include <gtk/gtk.h>
 #include "focus.h"
 
-typedef struct _Wswin Wswin;
-typedef struct _WswinWidget WswinWidget;
-typedef struct _WseWidgetClass WsWidgetClass;
+typedef struct _Wswin            Wswin;
+typedef struct _WswinWidget      WswinWidget;
+typedef struct _WswinWidgetClass WswinWidgetClass;
 
 struct _Wswin
 {
@@ -52,21 +52,21 @@ struct _WswinWidget
     GtkWidget *class;
     GtkWidget *label;
     GtkWidget *container;
-    GtkWidget *selected;
 
-    gulong selected_callback;
     gint monitor_num;
     gint width, height;
-    gint grid_cols;
-    gint grid_rows;
+    gint cols;
+    gint rows;
+    gint selected;
 };
 
-struct _TabwinWidgetClass
+struct _WswinWidgetClass
 {
     GtkWindowClass __parent__;
 };
 
 Wswin                  *wswinCreate                             (ScreenInfo *);
 void                   wswinDestroy                             (Wswin *);
+void                   wswinSetSelected                         (Wswin *, gint);
 
 #endif /* INC_WORKSPACEWIN_H */
