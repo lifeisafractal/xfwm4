@@ -24,6 +24,22 @@
 #include "config.h"
 #endif
 
+#ifndef WIN_BORDER_WIDTH
+#define WIN_BORDER_WIDTH 1
+#endif
+
+#ifndef WIN_ALPHA
+#define WIN_ALPHA 0.85
+#endif
+
+#ifndef WIN_BORDER_ALPHA
+#define WIN_BORDER_ALPHA 0.5
+#endif
+
+#ifndef WIN_BORDER_RADIUS
+#define WIN_BORDER_RADIUS 10
+#endif
+
 #include <glib.h>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
@@ -135,20 +151,16 @@ wswinDraw (WswinWidget *wsw)
     cairo_set_line_width (cr, 1);
     cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 
-    cairo_rectangle(cr,0,0,width,height);
-    gdk_cairo_set_source_color(cr, bg_normal);
-    cairo_fill (cr);
     for(row = 0; row < wsw->rows; row++)
     {
         for(col = 0; col < wsw->cols; col++)
         {
             current = (row * wsw->cols) + col;
+            cairo_rectangle(cr, col*x_size+5, row*y_size+5, x_size-10, y_size-10);
+            gdk_cairo_set_source_color(cr, bg_normal);
             if(current == wsw->selected)
-            {
-                cairo_rectangle(cr, col*x_size, row*y_size, x_size, y_size);
                 gdk_cairo_set_source_color(cr, bg_selected);
-                cairo_fill (cr);
-            }
+            cairo_fill (cr);
         }
     }
 
@@ -158,25 +170,51 @@ wswinDraw (WswinWidget *wsw)
 static gboolean
 wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
 {
+    GdkScreen *screen;
     cairo_t *cr;
     GdkColor *bg_normal = get_color(wsw, GTK_STATE_NORMAL);
     GdkColor *bg_selected = get_color(wsw, GTK_STATE_SELECTED);
     gdouble width = wsw->allocation.width;
     gdouble height = wsw->allocation.height;
+    gdouble border_alpha = WIN_BORDER_ALPHA;
+    gdouble alpha = WIN_ALPHA;
+    gint border_radius = WIN_BORDER_RADIUS;
+    gdouble degrees = 3.14 / 180.0;
 
+    screen = gtk_widget_get_screen(GTK_WIDGET(wsw));
     cr = gdk_cairo_create (wsw->window);
     if (G_UNLIKELY (cr == NULL))
       return FALSE;
 
     cairo_set_line_width (cr, 1);
 
-    /* TODO: add support for compositing here */
-    cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-    cairo_rectangle(cr, 0, 0, width, height);
-    gdk_cairo_set_source_color(cr, bg_normal);
-    cairo_fill_preserve (cr);
-    gdk_cairo_set_source_color(cr, bg_selected);
-    cairo_stroke (cr);
+    if (gdk_screen_is_composited(screen)) {
+        cairo_set_operator(cr, CAIRO_OPERATOR_CLEAR);
+        gdk_cairo_region(cr, event->region);
+        cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.0);
+        cairo_fill_preserve(cr);
+        cairo_clip(cr);
+        cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+
+        /* Draw a filled rounded rectangle with an outline */
+        cairo_arc (cr, width - border_radius - 0.5, border_radius + 0.5, border_radius, -90 * degrees, 0 * degrees);
+        cairo_arc (cr, width - border_radius - 0.5, height - border_radius - 0.5, border_radius, 0 * degrees, 90 * degrees);
+        cairo_arc (cr, border_radius + 0.5, height - border_radius - 0.5, border_radius, 90 * degrees, 180 * degrees);
+        cairo_arc (cr, border_radius + 0.5, border_radius + 0.5, border_radius, 180 * degrees, 270 * degrees);
+        cairo_close_path(cr);
+        cairo_set_source_rgba (cr, bg_normal->red/65535.0, bg_normal->green/65535.0, bg_normal->blue/65535.0, alpha);
+        cairo_fill_preserve (cr);
+        cairo_set_source_rgba (cr, bg_selected->red/65535.0, bg_selected->green/65535.0, bg_selected->blue/65535.0, border_alpha);
+        cairo_stroke (cr);
+    }
+    else{
+        cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+        cairo_rectangle(cr, 0, 0, width, height);
+        gdk_cairo_set_source_color(cr, bg_normal);
+        cairo_fill_preserve (cr);
+        gdk_cairo_set_source_color(cr, bg_selected);
+        cairo_stroke (cr);
+    }
 
     cairo_destroy (cr);
 
