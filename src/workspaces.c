@@ -245,6 +245,7 @@ workspaceSwitchFilter (XEvent * xevent, gpointer data)
                 key == KEY_RIGHT_WORKSPACE)
             {
                 handle_workspace_event(screen_info, NULL, (XKeyEvent *) xevent);
+                wswinSetSelected(passdata->wswin, screen_info->current_ws);
             }
             /* If last key press event didn't have our modifiers pressed, finish workspace switching */
             if (!(xevent->xkey.state & modifiers))
@@ -287,7 +288,7 @@ workspaceSwitchFilter (XEvent * xevent, gpointer data)
 void workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
 {
     /* TODO: add trace statements */
-    /* TODO: check if key has no modifiers, don't enter display loop if so */
+
     /* TODO: add support for move with current window */
     DisplayInfo *display_info;
     gboolean g1, g2;
@@ -295,7 +296,8 @@ void workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent
 
     display_info = screen_info->display_info;
 
-    handle_workspace_event(screen_info, c, ev);
+    /* TODO: check if key has no modifiers, don't enter display loop if so */
+    /* Just so handle_workspace_event and return */
 
     g1 = myScreenGrabKeyboard (screen_info, ev->time);
     g2 = myScreenGrabPointer (screen_info, LeaveWindowMask,  None, ev->time);
@@ -316,6 +318,9 @@ void workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent
     passdata.wswin = wswinCreate(screen_info);
 
     TRACE ("entering worspace loop");
+
+    handle_workspace_event(screen_info, c, ev);
+    wswinSetSelected(passdata.wswin, screen_info->current_ws);
 
     eventFilterPush (display_info->xfilter, workspaceSwitchFilter, &passdata);
     gtk_main ();
