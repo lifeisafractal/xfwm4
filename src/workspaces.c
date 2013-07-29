@@ -46,6 +46,13 @@
 #include "stacking.h"
 #include "hints.h"
 
+typedef struct _WorkspaceSwitchData WorkspaceSwitchData;
+struct _WorkspaceSwitchData
+{
+    ScreenInfo *screen_info;
+    Client *c;
+};
+
 static void
 workspaceGetPosition (ScreenInfo *screen_info, int n, int * row, int * col)
 {
@@ -177,12 +184,146 @@ modify_with_wrap (int value, int by, int limit, gboolean wrap)
     return value;
 }
 
+static void handle_workspace_event(ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
+{
+    int key;
+
+    key = myScreenGetKeyPressed(screen_info, ev);
+    switch(key)
+    {
+        case KEY_UP_WORKSPACE:
+            workspaceMove(screen_info, -1, 0, NULL, ev->time);
+            break;
+        case KEY_DOWN_WORKSPACE:
+            workspaceMove(screen_info, 1, 0, NULL, ev->time);
+            break;
+        case KEY_LEFT_WORKSPACE:
+            workspaceMove(screen_info, 0, -1, NULL, ev->time);
+            break;
+        case KEY_RIGHT_WORKSPACE:
+            workspaceMove(screen_info, 0, 1, NULL, ev->time);
+            break;
+    }
+}
+
+static eventFilterStatus
+workspaceSwitchFilter (XEvent * xevent, gpointer data)
+{
+    ScreenInfo *screen_info;
+    DisplayInfo *display_info;
+    WorkspaceSwitchData *passdata;
+    eventFilterStatus status;
+    int key, modifiers;
+    gboolean switching;
+
+    TRACE ("entering workspaceSwitchFilter");
+
+    passdata = (WorkspaceSwitchData *) data;
+
+    screen_info = passdata->screen_info;
+    display_info = screen_info->display_info;
+    modifiers = (screen_info->params->keys[KEY_LEFT_WORKSPACE].modifier |
+                 screen_info->params->keys[KEY_RIGHT_WORKSPACE].modifier |
+                 screen_info->params->keys[KEY_UP_WORKSPACE].modifier |
+                 screen_info->params->keys[KEY_DOWN_WORKSPACE].modifier);
+    status = EVENT_FILTER_STOP;
+
+    switching = TRUE;
+
+    /* Update the display time */
+    myDisplayUpdateCurrentTime (display_info, xevent);
+
+    switch (xevent->type)
+    {
+        case KeyPress:
+            key = myScreenGetKeyPressed (screen_info, (XKeyEvent *) xevent);
+            if (key == KEY_UP_WORKSPACE |
+                key == KEY_DOWN_WORKSPACE |
+                key == KEY_LEFT_WORKSPACE |
+                key == KEY_RIGHT_WORKSPACE)
+            {
+                handle_workspace_event(screen_info, NULL, (XKeyEvent *) xevent);
+            }
+            /* If last key press event didn't have our modifiers pressed, finish workspace switching */
+            if (!(xevent->xkey.state & modifiers))
+            {
+                switching = FALSE;
+            }
+            break;
+        case KeyRelease:
+            {
+                int keysym = XLookupKeysym (&xevent->xkey, 0);
+
+                if (IsModifierKey(keysym))
+                {
+                    if (!(myScreenGetModifierPressed (screen_info) & modifiers))
+                    {
+                        switching = FALSE;
+                    }
+                }
+            }
+            break;
+        case ButtonPress:
+        case ButtonRelease:
+        case EnterNotify:
+        case MotionNotify:
+            break;
+        default:
+            status = EVENT_FILTER_CONTINUE;
+            break;
+    }
+
+    if (!switching)
+    {
+        //TRACE ("event loop now finished");
+        gtk_main_quit ();
+    }
+
+    return status;
+}
+
 void workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
 {
     /* TODO: add trace statements */
     /* TODO: check if key has no modifiers, don't enter display loop if so */
     /* TODO: add support for move with current window */
+    DisplayInfo *display_info;
+    gboolean g1, g2;
+    WorkspaceSwitchData passdata;
+
+    display_info = screen_info->display_info;
+
     handle_workspace_event(screen_info, c, ev);
+
+    g1 = myScreenGrabKeyboard (screen_info, ev->time);
+    g2 = myScreenGrabPointer (screen_info, LeaveWindowMask,  None, ev->time);
+
+    if (!g1 || !g2)
+    {
+        TRACE ("grab failed in workspaceSwitchInteractive");
+
+        gdk_beep ();
+        myScreenUngrabKeyboard (screen_info, myDisplayGetCurrentTime (display_info));
+        myScreenUngrabPointer (screen_info, myDisplayGetCurrentTime (display_info));
+
+        return;
+    }
+
+    passdata.c = NULL;
+    passdata.screen_info = screen_info;
+
+    TRACE ("entering worspace loop");
+
+    eventFilterPush (display_info->xfilter, workspaceSwitchFilter, &passdata);
+    gtk_main ();
+    eventFilterPop (display_info->xfilter);
+
+    TRACE("leaving workspace loop");
+
+    updateXserverTime(display_info);
+
+    myScreenUngrabKeyboard (screen_info, myDisplayGetCurrentTime (display_info));
+    myScreenUngrabPointer (screen_info, myDisplayGetCurrentTime (display_info));
 }
 
 /* returns TRUE if the workspace was changed, FALSE otherwise */
