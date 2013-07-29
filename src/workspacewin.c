@@ -172,6 +172,7 @@ wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
 
     cairo_set_line_width (cr, 1);
 
+    /* TODO: add support for compositing here */
     cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
     cairo_rectangle(cr, 0, 0, width, height);
     gdk_cairo_set_source_color(cr, bg_normal);
@@ -179,11 +180,8 @@ wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
     gdk_cairo_set_source_color(cr, bg_selected);
     cairo_stroke (cr);
 
-    cairo_rectangle(cr, 10, 10, 30, 30);
-    gdk_cairo_set_source_color(cr, bg_selected);
-    cairo_fill_preserve (cr);
-
     cairo_destroy (cr);
+
     return FALSE;
 }
 
