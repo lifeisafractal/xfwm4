@@ -50,6 +50,7 @@
 typedef struct _WorkspaceSwitchData WorkspaceSwitchData;
 struct _WorkspaceSwitchData
 {
+    Wswin *wswin;
     ScreenInfo *screen_info;
     Client *c;
 };
@@ -312,6 +313,7 @@ void workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent
 
     passdata.c = NULL;
     passdata.screen_info = screen_info;
+    passdata.wswin = wswinCreate(screen_info);
 
     TRACE ("entering worspace loop");
 
@@ -322,6 +324,9 @@ void workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent
     TRACE("leaving workspace loop");
 
     updateXserverTime(display_info);
+
+    wswinDestroy(passdata.wswin);
+    g_free(passdata.wswin);
 
     myScreenUngrabKeyboard (screen_info, myDisplayGetCurrentTime (display_info));
     myScreenUngrabPointer (screen_info, myDisplayGetCurrentTime (display_info));

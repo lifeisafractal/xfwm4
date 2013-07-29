@@ -27,17 +27,33 @@
 #include <glib.h>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
-#include <libxfce4util/libxfce4util.h>
-#include "icons.h"
 #include "focus.h"
 #include "workspacewin.h"
 
+static WswinWidget *
+wswinCreateWidget ()
+{
+    WswinWidget *wsw;
+
+    return wsw;
+}
+
 Wswin *
-wswinCreate ()
+wswinCreate (ScreenInfo *screen_info)
 {
     Wswin *wswin;
+    int num_monitors, i;
 
     wswin = g_new0(Wswin, 1);
+
+    num_monitors = myScreenGetNumMonitors (screen_info);
+    for (i = 0; i < num_monitors; i++)
+    {
+        gint monitor_index;
+
+        monitor_index = myScreenGetMonitorIndex(screen_info, i);
+        wswin->wswin_list = g_list_append(wswin->wswin_list, wswinCreateWidget());
+    }
 
     return wswin;
 }

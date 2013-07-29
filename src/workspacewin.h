@@ -30,6 +30,7 @@
 #include <glib.h>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
+#include "focus.h"
 
 typedef struct _Wswin Wswin;
 typedef struct _WswinWidget WswinWidget;
@@ -65,7 +66,7 @@ struct _TabwinWidgetClass
     GtkWindowClass __parent__;
 };
 
-Wswin                  *wswinCreate                             ();
+Wswin                  *wswinCreate                             (ScreenInfo *);
 void                   wswinDestroy                             (Wswin *);
 
 #endif /* INC_WORKSPACEWIN_H */
