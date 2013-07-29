@@ -178,6 +178,122 @@ modify_with_wrap (int value, int by, int limit, gboolean wrap)
     return value;
 }
 
+static void
+handle_workspace_event(ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
+{
+    int key;
+
+    key = myScreenGetKeyPressed(screen_info, ev);
+    if(c)
+    {
+        switch(key)
+        {
+            case KEY_MOVE_NEXT_WORKSPACE:
+                workspaceSwitch (screen_info, screen_info->current_ws + 1, c, TRUE, ev->time);
+                break;
+            case KEY_MOVE_PREV_WORKSPACE:
+                workspaceSwitch (screen_info, screen_info->current_ws - 1, c, TRUE, ev->time);
+                break;
+            case KEY_MOVE_UP_WORKSPACE:
+                workspaceMove (screen_info, -1, 0, c, ev->time);
+                break;
+            case KEY_MOVE_DOWN_WORKSPACE:
+                workspaceMove (screen_info, 1, 0, c, ev->time);
+                break;
+            case KEY_MOVE_LEFT_WORKSPACE:
+                workspaceMove (screen_info, 0, -1, c, ev->time);
+                break;
+            case KEY_MOVE_RIGHT_WORKSPACE:
+                workspaceMove (screen_info, 0, 1, c, ev->time);
+                break;
+            case KEY_MOVE_WORKSPACE_1:
+            case KEY_MOVE_WORKSPACE_2:
+            case KEY_MOVE_WORKSPACE_3:
+            case KEY_MOVE_WORKSPACE_4:
+            case KEY_MOVE_WORKSPACE_5:
+            case KEY_MOVE_WORKSPACE_6:
+            case KEY_MOVE_WORKSPACE_7:
+            case KEY_MOVE_WORKSPACE_8:
+            case KEY_MOVE_WORKSPACE_9:
+            case KEY_MOVE_WORKSPACE_10:
+            case KEY_MOVE_WORKSPACE_11:
+            case KEY_MOVE_WORKSPACE_12:
+                if ((guint) (key - KEY_MOVE_WORKSPACE_1) < screen_info->workspace_count)
+                {
+                    clientRaise (c, None);
+                    workspaceSwitch (screen_info, key - KEY_MOVE_WORKSPACE_1, c, TRUE, ev->time);
+                }
+                break;
+        }
+    }
+
+    switch(key)
+    {
+        case KEY_NEXT_WORKSPACE:
+            workspaceSwitch (screen_info, screen_info->current_ws + 1, NULL, TRUE, ev->time);
+            break;
+        case KEY_PREV_WORKSPACE:
+            workspaceSwitch (screen_info, screen_info->current_ws - 1, NULL, TRUE, ev->time);
+            break;
+        case KEY_UP_WORKSPACE:
+            workspaceMove(screen_info, -1, 0, NULL, ev->time);
+            break;
+        case KEY_DOWN_WORKSPACE:
+            workspaceMove(screen_info, 1, 0, NULL, ev->time);
+            break;
+        case KEY_LEFT_WORKSPACE:
+            workspaceMove(screen_info, 0, -1, NULL, ev->time);
+            break;
+        case KEY_RIGHT_WORKSPACE:
+            workspaceMove(screen_info, 0, 1, NULL, ev->time);
+            break;
+        case KEY_WORKSPACE_1:
+        case KEY_WORKSPACE_2:
+        case KEY_WORKSPACE_3:
+        case KEY_WORKSPACE_4:
+        case KEY_WORKSPACE_5:
+        case KEY_WORKSPACE_6:
+        case KEY_WORKSPACE_7:
+        case KEY_WORKSPACE_8:
+        case KEY_WORKSPACE_9:
+        case KEY_WORKSPACE_10:
+        case KEY_WORKSPACE_11:
+        case KEY_WORKSPACE_12:
+            if ((guint) (key - KEY_WORKSPACE_1) < screen_info->workspace_count)
+            {
+                workspaceSwitch (screen_info, key - KEY_WORKSPACE_1, NULL, TRUE, ev->time);
+            }
+           break;
+    }
+}
+
+void
+workspaceChangeInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
+{
+    /* TODO: Rebase this off of the main branch, not the alt-tab modified branch */
+    /* TODO: add trace statements */
+    /* TODO: check that screen_info and ev exisist (use )*/
+    int key, modifier;
+
+    modifier = 0;
+    key = myScreenGetKeyPressed(screen_info, ev);
+    modifier = screen_info->params->keys[key].modifier;
+
+    //if (!modifier)
+    if(1)
+    {
+        /*
+         * The shortcut has no modifier so there's no point in entering
+         * the cycle loop, just select the next or previous window and
+         * that's it...
+         */
+        handle_workspace_event(screen_info, c, ev);
+        return;
+    }
+
+
+}
+
 /* returns TRUE if the workspace was changed, FALSE otherwise */
 gboolean
 workspaceMove (ScreenInfo *screen_info, gint rowmod, gint colmod, Client * c, guint32 timestamp)

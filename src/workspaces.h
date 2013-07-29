@@ -37,6 +37,9 @@
 #include "screen.h"
 #include "client.h"
 
+void                    workspaceChangeInteractive              (ScreenInfo *,
+                                                                 Client *,
+                                                                 XKeyEvent *);
 gboolean                workspaceMove                           (ScreenInfo *,
                                                                  int,
                                                                  int,

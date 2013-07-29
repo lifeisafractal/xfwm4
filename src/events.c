@@ -381,23 +381,11 @@ handleKeyPress (DisplayInfo *display_info, XKeyEvent * ev)
                 clientToggleFullscreen (c);
                 break;
             case KEY_MOVE_NEXT_WORKSPACE:
-                workspaceSwitch (screen_info, screen_info->current_ws + 1, c, TRUE, ev->time);
-                break;
             case KEY_MOVE_PREV_WORKSPACE:
-                workspaceSwitch (screen_info, screen_info->current_ws - 1, c, TRUE, ev->time);
-                break;
             case KEY_MOVE_UP_WORKSPACE:
-                workspaceMove (screen_info, -1, 0, c, ev->time);
-                break;
             case KEY_MOVE_DOWN_WORKSPACE:
-                workspaceMove (screen_info, 1, 0, c, ev->time);
-                break;
             case KEY_MOVE_LEFT_WORKSPACE:
-                workspaceMove (screen_info, 0, -1, c, ev->time);
-                break;
             case KEY_MOVE_RIGHT_WORKSPACE:
-                workspaceMove (screen_info, 0, 1, c, ev->time);
-                break;
             case KEY_MOVE_WORKSPACE_1:
             case KEY_MOVE_WORKSPACE_2:
             case KEY_MOVE_WORKSPACE_3:
@@ -410,12 +398,7 @@ handleKeyPress (DisplayInfo *display_info, XKeyEvent * ev)
             case KEY_MOVE_WORKSPACE_10:
             case KEY_MOVE_WORKSPACE_11:
             case KEY_MOVE_WORKSPACE_12:
-                if ((guint) (key - KEY_MOVE_WORKSPACE_1) < screen_info->workspace_count)
-                {
-                    clientRaise (c, None);
-                    workspaceSwitch (screen_info, key - KEY_MOVE_WORKSPACE_1, c, TRUE, ev->time);
-                }
-                break;
+                workspaceChangeInteractive(c->screen_info, c, ev);
             case KEY_POPUP_MENU:
                 show_window_menu (c, frameX (c) + frameLeft (c),
                                      frameY (c) + frameTop (c),
@@ -487,28 +470,25 @@ handleKeyPress (DisplayInfo *display_info, XKeyEvent * ev)
             clientSwitchApp ();
             break;
         case KEY_NEXT_WORKSPACE:
-            status = EVENT_FILTER_REMOVE;
-            workspaceSwitch (ev_screen_info, ev_screen_info->current_ws + 1, NULL, TRUE, ev->time);
-            break;
         case KEY_PREV_WORKSPACE:
-            status = EVENT_FILTER_REMOVE;
-            workspaceSwitch (ev_screen_info, ev_screen_info->current_ws - 1, NULL, TRUE, ev->time);
-            break;
         case KEY_UP_WORKSPACE:
-            status = EVENT_FILTER_REMOVE;
-            workspaceMove(ev_screen_info, -1, 0, NULL, ev->time);
-            break;
         case KEY_DOWN_WORKSPACE:
-            status = EVENT_FILTER_REMOVE;
-            workspaceMove(ev_screen_info, 1, 0, NULL, ev->time);
-            break;
         case KEY_LEFT_WORKSPACE:
-            status = EVENT_FILTER_REMOVE;
-            workspaceMove(ev_screen_info, 0, -1, NULL, ev->time);
-            break;
         case KEY_RIGHT_WORKSPACE:
+        case KEY_WORKSPACE_1:
+        case KEY_WORKSPACE_2:
+        case KEY_WORKSPACE_3:
+        case KEY_WORKSPACE_4:
+        case KEY_WORKSPACE_5:
+        case KEY_WORKSPACE_6:
+        case KEY_WORKSPACE_7:
+        case KEY_WORKSPACE_8:
+        case KEY_WORKSPACE_9:
+        case KEY_WORKSPACE_10:
+        case KEY_WORKSPACE_11:
+        case KEY_WORKSPACE_12:
             status = EVENT_FILTER_REMOVE;
-            workspaceMove(ev_screen_info, 0, 1, NULL, ev->time);
+            workspaceChangeInteractive(ev_screen_info, NULL, ev);
             break;
         case KEY_ADD_WORKSPACE:
             status = EVENT_FILTER_REMOVE;
@@ -523,24 +503,6 @@ handleKeyPress (DisplayInfo *display_info, XKeyEvent * ev)
             break;
         case KEY_DEL_ACTIVE_WORKSPACE:
             workspaceDelete (ev_screen_info, ev_screen_info->current_ws);
-            break;
-        case KEY_WORKSPACE_1:
-        case KEY_WORKSPACE_2:
-        case KEY_WORKSPACE_3:
-        case KEY_WORKSPACE_4:
-        case KEY_WORKSPACE_5:
-        case KEY_WORKSPACE_6:
-        case KEY_WORKSPACE_7:
-        case KEY_WORKSPACE_8:
-        case KEY_WORKSPACE_9:
-        case KEY_WORKSPACE_10:
-        case KEY_WORKSPACE_11:
-        case KEY_WORKSPACE_12:
-            status = EVENT_FILTER_REMOVE;
-            if ((guint) (key - KEY_WORKSPACE_1) < ev_screen_info->workspace_count)
-            {
-                workspaceSwitch (ev_screen_info, key - KEY_WORKSPACE_1, NULL, TRUE, ev->time);
-            }
             break;
         case KEY_SHOW_DESKTOP:
             status = EVENT_FILTER_REMOVE;
