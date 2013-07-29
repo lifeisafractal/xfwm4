@@ -40,6 +40,7 @@
 #include "misc.h"
 #include "transients.h"
 #include "workspaces.h"
+#include "workspacewin.h"
 #include "settings.h"
 #include "client.h"
 #include "focus.h"

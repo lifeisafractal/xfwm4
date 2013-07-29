@@ -67,6 +67,8 @@ xfwm4_SOURCES =								\
 	wireframe.h							\
 	workspaces.c							\
 	workspaces.h							\
+	workspacewin.c							\
+	workspacewin.h							\
 	xsync.c								\
 	xsync.h								\
 	xpm-color-table.h
