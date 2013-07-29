@@ -236,9 +236,25 @@ wswinCreateWidget (Wswin *wswin, ScreenInfo *screen_info, gint monitor_num)
 }
 
 void
-wswinSetSelected (Wswin *wswin, gint row, gint col)
+wswinSetSelected (Wswin *wswin, gint new_ws)
 {
+    GList *wswin_list;
+    WswinWidget *wsw;
+
+    g_print("in wswinsetselcted\n");
     g_return_if_fail ( wswin != NULL );
+    gint i=0;
+    for(wswin_list = wswin->wswin_list; wswin_list; wswin_list = g_list_next (wswin_list))
+    {
+        g_print("in the window loop\n");
+        wsw = (WswinWidget *) wswin_list->data;
+        if(new_ws < (wsw->count))
+        {
+            wsw->selected = new_ws;
+            g_print("calling draw\n");
+            wswinDraw(wsw);
+        }
+    }
 
 }
 
