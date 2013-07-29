@@ -60,7 +60,7 @@ wswin_widget_get_type (void)
             sizeof (WswinWidgetClass),
             NULL,
             NULL,
-            NULL, //(GClassInitFunc) wswin_widget_class_init,
+            (GClassInitFunc) wswin_widget_class_init,
             NULL,
             NULL,
             sizeof (WswinWidget),
@@ -240,7 +240,9 @@ wswinCreateWidget (Wswin *wswin, ScreenInfo *screen_info, gint monitor_num)
     wsw->selected = screen_info->current_ws;
 
     gtk_window_set_screen (GTK_WINDOW (wsw), screen_info->gscr);
-    gtk_widget_set_name (GTK_WIDGET (wsw), "xfwm4-wswin");
+    /* TODO: give this its own name like "xfwm4-wswin" */
+    /* for now we leave it the same for compatibility with themes */
+    gtk_widget_set_name (GTK_WIDGET (wsw), "xfwm4-tabwin");
 
     /* Check for compositing and set colormap for it */
     screen = gtk_widget_get_screen(GTK_WIDGET(wsw));
