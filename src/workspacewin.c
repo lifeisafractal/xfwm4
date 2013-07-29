@@ -145,8 +145,6 @@ wswinDraw (WswinWidget *wsw)
             current = (row * wsw->cols) + col;
             if(current == wsw->selected)
             {
-                g_print("now doing a workspace draw!\n");
-                g_print("Drawing %f, %f, %f %f\n",col*x_size, row*y_size, x_size, y_size);
                 cairo_rectangle(cr, col*x_size, row*y_size, x_size, y_size);
                 gdk_cairo_set_source_color(cr, bg_selected);
                 cairo_fill (cr);
@@ -239,17 +237,14 @@ wswinSetSelected (Wswin *wswin, gint new_ws)
     GList *wswin_list;
     WswinWidget *wsw;
 
-    g_print("in wswinsetselcted\n");
     g_return_if_fail ( wswin != NULL );
     gint i=0;
     for(wswin_list = wswin->wswin_list; wswin_list; wswin_list = g_list_next (wswin_list))
     {
-        g_print("in the window loop\n");
         wsw = (WswinWidget *) wswin_list->data;
         if(new_ws < (wsw->count))
         {
             wsw->selected = new_ws;
-            g_print("calling draw\n");
             wswinDraw(wsw);
         }
     }
