@@ -142,6 +142,8 @@ wswinDraw (WswinWidget *wsw)
     gdouble height = GTK_WIDGET(wsw)->allocation.height;
     gdouble x_size = width / wsw->cols;
     gdouble y_size = height / wsw->rows;
+    gint border_radius = WIN_BORDER_RADIUS;
+    gdouble degrees = 3.14 / 180.0;
     gint row, col, current;
 
     cr = gdk_cairo_create (GTK_WIDGET(wsw)->window);
@@ -156,6 +158,23 @@ wswinDraw (WswinWidget *wsw)
         for(col = 0; col < wsw->cols; col++)
         {
             current = (row * wsw->cols) + col;
+            /* Draw a filled rounded rectangle with an outline */
+            gint top, bot, left, right;
+            top = row*y_size+5;
+            bot = (row+1)*y_size-5;
+            left = col*x_size+5;
+            right = (col+1)*x_size-5;
+
+            cairo_arc (cr, right + border_radius - 0.5, top + border_radius + 0.5, border_radius, -90 * degrees, 0 * degrees);
+            cairo_arc (cr, right + border_radius - 0.5, bot - border_radius - 0.5, border_radius, 0 * degrees, 90 * degrees);
+            cairo_arc (cr, left + border_radius + 0.5, bot - border_radius - 0.5, border_radius, 90 * degrees, 180 * degrees);
+            cairo_arc (cr, left + border_radius + 0.5, top + border_radius + 0.5, border_radius, 180 * degrees, 270 * degrees);
+            cairo_close_path(cr);
+            //cairo_set_source_rgba (cr, bg_normal->red/65535.0, bg_normal->green/65535.0, bg_normal->blue/65535.0, alpha);
+            //cairo_fill_preserve (cr);
+            //cairo_set_source_rgba (cr, bg_selected->red/65535.0, bg_selected->green/65535.0, bg_selected->blue/65535.0, border_alpha);
+            //cairo_stroke (cr);
+
             cairo_rectangle(cr, col*x_size+5, row*y_size+5, x_size-10, y_size-10);
             gdk_cairo_set_source_color(cr, bg_normal);
             if(current == wsw->selected)
@@ -218,6 +237,7 @@ wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
 
     cairo_destroy (cr);
 
+
     return FALSE;
 }
 
@@ -260,7 +280,7 @@ wswinCreateWidget (Wswin *wswin, ScreenInfo *screen_info, gint monitor_num)
     gtk_window_move (GTK_WINDOW(wsw), monitor.x + monitor.width / 2,
                                       monitor.y + monitor.height / 2);
     /* TODO: set the size to be a param */
-    gtk_window_set_default_size(GTK_WINDOW(wsw), 64*(wsw->cols), 40*(wsw->rows));
+    gtk_window_set_default_size(GTK_WINDOW(wsw), 64*3*(wsw->cols), 40*3*(wsw->rows));
 
     g_signal_connect_swapped (wsw, "configure-event",
                                   GTK_SIGNAL_FUNC (wswinConfigure), (gpointer) wsw);
