@@ -177,6 +177,14 @@ modify_with_wrap (int value, int by, int limit, gboolean wrap)
     return value;
 }
 
+void workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
+{
+    /* TODO: add trace statements */
+    /* TODO: check if key has no modifiers, don't enter display loop if so */
+    /* TODO: add support for move with current window */
+    handle_workspace_event(screen_info, c, ev);
+}
+
 /* returns TRUE if the workspace was changed, FALSE otherwise */
 gboolean
 workspaceMove (ScreenInfo *screen_info, gint rowmod, gint colmod, Client * c, guint32 timestamp)
