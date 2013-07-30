@@ -143,6 +143,8 @@ wswinDraw (WswinWidget *wsw)
     gdouble x_size = width / wsw->cols;
     gdouble y_size = height / wsw->rows;
     gint border_radius = WIN_BORDER_RADIUS;
+    gdouble border_alpha = WIN_BORDER_ALPHA;
+    gdouble alpha = WIN_ALPHA;
     gdouble degrees = 3.14 / 180.0;
     gint row, col, current;
 
@@ -178,11 +180,14 @@ wswinDraw (WswinWidget *wsw)
             //cairo_set_source_rgba (cr, bg_selected->red/65535.0, bg_selected->green/65535.0, bg_selected->blue/65535.0, border_alpha);
             //cairo_stroke (cr);
 
-            cairo_rectangle(cr, col*x_size+5, row*y_size+5, x_size-10, y_size-10);
-            gdk_cairo_set_source_color(cr, bg_normal);
+            //cairo_rectangle(cr, col*x_size+5, row*y_size+5, x_size-10, y_size-10);
+            //gdk_cairo_set_source_color(cr, bg_normal);
+            cairo_set_source_rgba (cr, bg_selected->red/65535.0, bg_selected->green/65535.0, bg_selected->blue/65535.0, border_alpha);
             if(current == wsw->selected)
                 gdk_cairo_set_source_color(cr, bg_selected);
-            cairo_fill (cr);
+            cairo_fill_preserve (cr);
+            gdk_cairo_set_source_color(cr, bg_selected);
+            cairo_stroke (cr);
         }
     }
 
@@ -227,9 +232,11 @@ wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
         cairo_arc (cr, border_radius + 0.5, height - border_radius - 0.5, border_radius, 90 * degrees, 180 * degrees);
         cairo_arc (cr, border_radius + 0.5, border_radius + 0.5, border_radius, 180 * degrees, 270 * degrees);
         cairo_close_path(cr);
-        cairo_set_source_rgba (cr, bg_normal->red/65535.0, bg_normal->green/65535.0, bg_normal->blue/65535.0, alpha);
+        gdk_cairo_set_source_color(cr, bg_normal);
+        //cairo_set_source_rgba (cr, bg_normal->red/65535.0, bg_normal->green/65535.0, bg_normal->blue/65535.0, alpha);
         cairo_fill_preserve (cr);
-        cairo_set_source_rgba (cr, bg_selected->red/65535.0, bg_selected->green/65535.0, bg_selected->blue/65535.0, border_alpha);
+        gdk_cairo_set_source_color(cr, bg_selected);
+        //cairo_set_source_rgba (cr, bg_selected->red/65535.0, bg_selected->green/65535.0, bg_selected->blue/65535.0, border_alpha);
         cairo_stroke (cr);
     }
     else{
