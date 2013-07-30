@@ -288,8 +288,7 @@ workspaceSwitchFilter (XEvent * xevent, gpointer data)
 void
 workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
 {
-    /* TODO: add trace statements */
-
+    /* TODO: add trace statements (to all code) */
     /* TODO: add support for move with current window */
     DisplayInfo *display_info;
     gboolean g1, g2;
@@ -297,8 +296,6 @@ workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev
     int key, modifier;
 
     display_info = screen_info->display_info;
-
-    handle_workspace_event(screen_info, c, ev);
 
     modifier = 0;
     key = myScreenGetKeyPressed (screen_info, ev);
@@ -318,9 +315,9 @@ workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev
          * the cycle loop, and we already servied the event above
          * that's it...
          */
+        handle_workspace_event(screen_info, c, ev);
         return;
     }
-
 
     g1 = myScreenGrabKeyboard (screen_info, ev->time);
     g2 = myScreenGrabPointer (screen_info, LeaveWindowMask,  None, ev->time);
@@ -335,6 +332,8 @@ workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev
 
         return;
     }
+
+    handle_workspace_event(screen_info, c, ev);
 
     passdata.c = NULL;
     passdata.screen_info = screen_info;
