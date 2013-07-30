@@ -135,6 +135,7 @@ get_color (GtkWidget *win, GtkStateType state_type)
 static void
 wswinDraw (WswinWidget *wsw)
 {
+    GdkScreen *screen;
     cairo_t *cr;
     GdkColor *bg_normal = get_color(GTK_WIDGET (wsw), GTK_STATE_NORMAL);
     GdkColor *bg_selected = get_color(GTK_WIDGET (wsw), GTK_STATE_SELECTED);
@@ -146,15 +147,20 @@ wswinDraw (WswinWidget *wsw)
     gdouble border_alpha = WIN_BORDER_ALPHA;
     gdouble alpha = WIN_ALPHA;
     gdouble degrees = 3.14 / 180.0;
+    gboolean composited;
     gint row, col, current;
 
     cr = gdk_cairo_create (GTK_WIDGET(wsw)->window);
     if (G_UNLIKELY (cr == NULL))
       return;
 
+    screen = gtk_widget_get_screen(GTK_WIDGET(wsw));
+    composited = gdk_screen_is_composited(screen);
+
     cairo_set_line_width (cr, 1);
     cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 
+    /* TODO: only draw new and previous workspace for efficenciy */
     for(row = 0; row < wsw->rows; row++)
     {
         for(col = 0; col < wsw->cols; col++)
@@ -175,14 +181,12 @@ wswinDraw (WswinWidget *wsw)
             cairo_arc (cr, left + border_radius + 0.5, bot - border_radius - 0.5, border_radius, 90 * degrees, 180 * degrees);
             cairo_arc (cr, left + border_radius + 0.5, top + border_radius + 0.5, border_radius, 180 * degrees, 270 * degrees);
             cairo_close_path(cr);
-            //cairo_set_source_rgba (cr, bg_normal->red/65535.0, bg_normal->green/65535.0, bg_normal->blue/65535.0, alpha);
-            //cairo_fill_preserve (cr);
-            //cairo_set_source_rgba (cr, bg_selected->red/65535.0, bg_selected->green/65535.0, bg_selected->blue/65535.0, border_alpha);
-            //cairo_stroke (cr);
 
-            //cairo_rectangle(cr, col*x_size+5, row*y_size+5, x_size-10, y_size-10);
-            //gdk_cairo_set_source_color(cr, bg_normal);
-            cairo_set_source_rgba (cr, bg_selected->red/65535.0, bg_selected->green/65535.0, bg_selected->blue/65535.0, border_alpha);
+            if(composited)
+                cairo_set_source_rgba (cr, bg_selected->red/65535.0, bg_selected->green/65535.0, bg_selected->blue/65535.0, border_alpha);
+            else
+                gdk_cairo_set_source_color(cr, bg_normal);
+
             if(current == wsw->selected)
                 gdk_cairo_set_source_color(cr, bg_selected);
             cairo_fill_preserve (cr);
