@@ -158,6 +158,9 @@ wswinDraw (WswinWidget *wsw)
         for(col = 0; col < wsw->cols; col++)
         {
             current = (row * wsw->cols) + col;
+            if(current >= wsw->count)
+                break;
+
             /* Draw a filled rounded rectangle with an outline */
             gint top, bot, left, right;
             top = row*y_size+5;
