@@ -168,8 +168,8 @@ wswinDraw (WswinWidget *wsw)
             left = col*x_size+5;
             right = (col+1)*x_size-5;
 
-            cairo_arc (cr, right + border_radius - 0.5, top + border_radius + 0.5, border_radius, -90 * degrees, 0 * degrees);
-            cairo_arc (cr, right + border_radius - 0.5, bot - border_radius - 0.5, border_radius, 0 * degrees, 90 * degrees);
+            cairo_arc (cr, right - border_radius - 0.5, top + border_radius + 0.5, border_radius, -90 * degrees, 0 * degrees);
+            cairo_arc (cr, right - border_radius - 0.5, bot - border_radius - 0.5, border_radius, 0 * degrees, 90 * degrees);
             cairo_arc (cr, left + border_radius + 0.5, bot - border_radius - 0.5, border_radius, 90 * degrees, 180 * degrees);
             cairo_arc (cr, left + border_radius + 0.5, top + border_radius + 0.5, border_radius, 180 * degrees, 270 * degrees);
             cairo_close_path(cr);
