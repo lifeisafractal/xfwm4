@@ -276,6 +276,7 @@ wswinCreateWidget (Wswin *wswin, ScreenInfo *screen_info, gint monitor_num)
     wsw->cols = screen_info->desktop_layout.cols;
     wsw->count = screen_info->workspace_count;
     wsw->selected = screen_info->current_ws;
+    wsw->previous = wsw->selected;
 
     gtk_window_set_screen (GTK_WINDOW (wsw), screen_info->gscr);
     /* TODO: give this its own name like "xfwm4-wswin" */
@@ -322,8 +323,12 @@ wswinSetSelected (Wswin *wswin, gint new_ws)
         wsw = (WswinWidget *) wswin_list->data;
         if(new_ws < (wsw->count))
         {
-            wsw->selected = new_ws;
-            wswinDraw(wsw);
+            if(wsw->selected != new_ws)
+            {
+                wsw->previous = wsw->selected;
+                wsw->selected = new_ws;
+                wswinDraw(wsw);
+            }
         }
     }
 

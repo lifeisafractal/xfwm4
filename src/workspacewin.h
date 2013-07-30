@@ -59,6 +59,7 @@ struct _WswinWidget
     gint rows;
     gint count;
     gint selected;
+    gint previous;
 };
 
 struct _WswinWidgetClass
