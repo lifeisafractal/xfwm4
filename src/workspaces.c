@@ -285,7 +285,8 @@ workspaceSwitchFilter (XEvent * xevent, gpointer data)
     return status;
 }
 
-void workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
+void
+workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
 {
     /* TODO: add trace statements */
 
