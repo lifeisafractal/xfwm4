@@ -53,6 +53,7 @@ struct _WswinWidget
     GtkWidget *label;
     GtkWidget *container;
 
+    gboolean undrawn;
     gint monitor_num;
     gint width, height;
     gint cols;

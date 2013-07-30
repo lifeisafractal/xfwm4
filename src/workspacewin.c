@@ -159,15 +159,19 @@ wswinDraw (WswinWidget *wsw)
 
     cairo_set_line_width (cr, 1);
     cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-
-    /* TODO: only draw new and previous workspace for efficenciy */
+    /* TODO: use workspaces.c style workspaceGetPosition so that we respect freedestop.org's layout stuff */
     for(row = 0; row < wsw->rows; row++)
     {
         for(col = 0; col < wsw->cols; col++)
         {
             current = (row * wsw->cols) + col;
             if(current >= wsw->count)
-                break;
+                continue;
+
+            /* only draw if we are the current or previous work space */
+            /* draw no matter what if we are not yet drawn */
+            if((wsw->undrawn == FALSE) && (current != wsw->selected) && (current != wsw->previous))
+                continue;
 
             /* Draw a filled rounded rectangle with an outline */
             gint top, bot, left, right;
@@ -196,6 +200,8 @@ wswinDraw (WswinWidget *wsw)
     }
 
     cairo_destroy (cr);
+
+    wsw->undrawn = FALSE;
 }
 
 static gboolean
@@ -277,6 +283,7 @@ wswinCreateWidget (Wswin *wswin, ScreenInfo *screen_info, gint monitor_num)
     wsw->count = screen_info->workspace_count;
     wsw->selected = screen_info->current_ws;
     wsw->previous = wsw->selected;
+    wsw->undrawn = TRUE;
 
     gtk_window_set_screen (GTK_WINDOW (wsw), screen_info->gscr);
     /* TODO: give this its own name like "xfwm4-wswin" */
