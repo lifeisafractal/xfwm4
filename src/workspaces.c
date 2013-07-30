@@ -232,11 +232,6 @@ workspaceSwitchFilter (XEvent * xevent, gpointer data)
 
     switching = TRUE;
 
-    /* FIXME: I'm calling this on every event because you don't get the first
-     * workspace switch to draw it.  Figure out a way to get this to work before
-     * I enter the event loop here */
-    wswinSetSelected(passdata->wswin, screen_info->current_ws);
-
     /* Update the display time */
     myDisplayUpdateCurrentTime (display_info, xevent);
 
@@ -303,6 +298,7 @@ void workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent
 
     /* TODO: check if key has no modifiers, don't enter display loop if so */
     /* Just so handle_workspace_event and return */
+    handle_workspace_event(screen_info, c, ev);
 
     g1 = myScreenGrabKeyboard (screen_info, ev->time);
     g2 = myScreenGrabPointer (screen_info, LeaveWindowMask,  None, ev->time);
@@ -323,8 +319,6 @@ void workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent
     passdata.wswin = wswinCreate(screen_info);
 
     TRACE ("entering worspace loop");
-
-    handle_workspace_event(screen_info, c, ev);
 
     eventFilterPush (display_info->xfilter, workspaceSwitchFilter, &passdata);
     gtk_main ();

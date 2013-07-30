@@ -189,6 +189,7 @@ wswinDraw (WswinWidget *wsw)
 static gboolean
 wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
 {
+    WswinWidget *wswin;
     GdkScreen *screen;
     cairo_t *cr;
     GdkColor *bg_normal = get_color(wsw, GTK_STATE_NORMAL);
@@ -204,6 +205,8 @@ wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
     cr = gdk_cairo_create (wsw->window);
     if (G_UNLIKELY (cr == NULL))
       return FALSE;
+
+    wswin = (WswinWidget *) data;
 
     cairo_set_line_width (cr, 1);
 
@@ -237,6 +240,7 @@ wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
 
     cairo_destroy (cr);
 
+    wswinDraw(wswin);
 
     return FALSE;
 }
