@@ -294,12 +294,33 @@ workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev
     DisplayInfo *display_info;
     gboolean g1, g2;
     WorkspaceSwitchData passdata;
+    int key, modifier;
 
     display_info = screen_info->display_info;
 
-    /* TODO: check if key has no modifiers, don't enter display loop if so */
-    /* Just so handle_workspace_event and return */
     handle_workspace_event(screen_info, c, ev);
+
+    modifier = 0;
+    key = myScreenGetKeyPressed (screen_info, ev);
+    switch(key)
+    {
+        case KEY_UP_WORKSPACE:
+        case KEY_DOWN_WORKSPACE:
+        case KEY_LEFT_WORKSPACE:
+        case KEY_RIGHT_WORKSPACE:
+            modifier = screen_info->params->keys[key].modifier;
+    }
+    g_print("modifier was %i\n",screen_info->params->keys[key].modifier);
+    if (!modifier)
+    {
+        /*
+         * The shortcut has no modifier so there's no point in entering
+         * the cycle loop, and we already servied the event above
+         * that's it...
+         */
+        return;
+    }
+
 
     g1 = myScreenGrabKeyboard (screen_info, ev->time);
     g2 = myScreenGrabPointer (screen_info, LeaveWindowMask,  None, ev->time);
