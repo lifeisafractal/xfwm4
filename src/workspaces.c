@@ -310,7 +310,7 @@ workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev
         case KEY_RIGHT_WORKSPACE:
             modifier = screen_info->params->keys[key].modifier;
     }
-    g_print("modifier was %i\n",screen_info->params->keys[key].modifier);
+
     if (!modifier)
     {
         /*
