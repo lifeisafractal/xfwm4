@@ -137,12 +137,13 @@ wswinDraw (WswinWidget *wsw)
 {
     GdkScreen *screen;
     cairo_t *cr;
+    Wswin *wswin = wsw->wswin;
     GdkColor *bg_normal = get_color(GTK_WIDGET (wsw), GTK_STATE_NORMAL);
     GdkColor *bg_selected = get_color(GTK_WIDGET (wsw), GTK_STATE_SELECTED);
     gdouble width = GTK_WIDGET(wsw)->allocation.width;
     gdouble height = GTK_WIDGET(wsw)->allocation.height;
-    gdouble x_size = width / wsw->cols;
-    gdouble y_size = height / wsw->rows;
+    gdouble x_size = width / wswin->cols;
+    gdouble y_size = height / wswin->rows;
     gint border_radius = WIN_BORDER_RADIUS;
     gdouble border_alpha = WIN_BORDER_ALPHA;
     gdouble alpha = WIN_ALPHA;
@@ -160,17 +161,17 @@ wswinDraw (WswinWidget *wsw)
     cairo_set_line_width (cr, 1);
     cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
     /* TODO: use workspaces.c style workspaceGetPosition so that we respect freedestop.org's layout stuff */
-    for(row = 0; row < wsw->rows; row++)
+    for(row = 0; row < wswin->rows; row++)
     {
-        for(col = 0; col < wsw->cols; col++)
+        for(col = 0; col < wswin->cols; col++)
         {
-            current = (row * wsw->cols) + col;
-            if(current >= wsw->count)
+            current = (row * wswin->cols) + col;
+            if(current >= wswin->count)
                 continue;
 
             /* only draw if we are the current or previous work space */
             /* draw no matter what if we are not yet drawn */
-            if((wsw->undrawn == FALSE) && (current != wsw->selected) && (current != wsw->previous))
+            if((wsw->undrawn == FALSE) && (current != wswin->selected) && (current != wswin->previous))
                 continue;
 
             /* Draw a filled rounded rectangle with an outline */
@@ -191,7 +192,7 @@ wswinDraw (WswinWidget *wsw)
             else
                 gdk_cairo_set_source_color(cr, bg_normal);
 
-            if(current == wsw->selected)
+            if(current == wswin->selected)
                 gdk_cairo_set_source_color(cr, bg_selected);
             cairo_fill_preserve (cr);
             gdk_cairo_set_source_color(cr, bg_selected);
@@ -278,11 +279,6 @@ wswinCreateWidget (Wswin *wswin, ScreenInfo *screen_info, gint monitor_num)
     wsw->height = -1;
     wsw->monitor_num = monitor_num;
     wsw->wswin = wswin;
-    wsw->rows = screen_info->desktop_layout.rows;
-    wsw->cols = screen_info->desktop_layout.cols;
-    wsw->count = screen_info->workspace_count;
-    wsw->selected = screen_info->current_ws;
-    wsw->previous = wsw->selected;
     wsw->undrawn = TRUE;
 
     gtk_window_set_screen (GTK_WINDOW (wsw), screen_info->gscr);
@@ -306,7 +302,7 @@ wswinCreateWidget (Wswin *wswin, ScreenInfo *screen_info, gint monitor_num)
     gtk_window_move (GTK_WINDOW(wsw), monitor.x + monitor.width / 2,
                                       monitor.y + monitor.height / 2);
     /* TODO: set the size to be a param */
-    gtk_window_set_default_size(GTK_WINDOW(wsw), 64*3*(wsw->cols), 40*3*(wsw->rows));
+    gtk_window_set_default_size(GTK_WINDOW(wsw), 64*3*(wswin->cols), 40*3*(wswin->rows));
 
     g_signal_connect_swapped (wsw, "configure-event",
                                   GTK_SIGNAL_FUNC (wswinConfigure), (gpointer) wsw);
@@ -324,18 +320,22 @@ wswinSetSelected (Wswin *wswin, gint new_ws)
     WswinWidget *wsw;
 
     g_return_if_fail ( wswin != NULL );
-    gint i=0;
+
+    /* Param checking */
+    if ( (wswin->selected != new_ws) && (new_ws < (wswin->count)) )
+    {
+        wswin->previous = wswin->selected;
+        wswin->selected = new_ws;
+    }
+    else
+        return;
+
     for(wswin_list = wswin->wswin_list; wswin_list; wswin_list = g_list_next (wswin_list))
     {
         wsw = (WswinWidget *) wswin_list->data;
-        if(new_ws < (wsw->count))
+        if(new_ws < (wswin->count))
         {
-            if(wsw->selected != new_ws)
-            {
-                wsw->previous = wsw->selected;
-                wsw->selected = new_ws;
                 wswinDraw(wsw);
-            }
         }
     }
 
@@ -352,6 +352,11 @@ wswinCreate (ScreenInfo *screen_info)
     TRACE ("entering wswinCreate");
     wswin = g_new0(Wswin, 1);
     wswin->wswin_list = NULL;
+    wswin->rows = screen_info->desktop_layout.rows;
+    wswin->cols = screen_info->desktop_layout.cols;
+    wswin->count = screen_info->workspace_count;
+    wswin->selected = screen_info->current_ws;
+    wswin->previous = wswin->selected;
     num_monitors = myScreenGetNumMonitors (screen_info);
     for (i = 0; i < num_monitors; i++)
     {

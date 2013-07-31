@@ -39,6 +39,11 @@ typedef struct _WswinWidgetClass WswinWidgetClass;
 struct _Wswin
 {
     GList *wswin_list;
+    gint cols;
+    gint rows;
+    gint count;
+    gint selected;
+    gint previous;
 };
 
 struct _WswinWidget
@@ -53,14 +58,9 @@ struct _WswinWidget
     GtkWidget *label;
     GtkWidget *container;
 
+    gint width, height;
     gboolean undrawn;
     gint monitor_num;
-    gint width, height;
-    gint cols;
-    gint rows;
-    gint count;
-    gint selected;
-    gint previous;
 };
 
 struct _WswinWidgetClass
