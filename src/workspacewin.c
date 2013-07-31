@@ -164,6 +164,7 @@ wswinDraw (WswinWidget *wsw)
     cairo_set_line_width (cr, 1);
     cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
     /* TODO: use workspaces.c style workspaceGetPosition so that we respect freedestop.org's layout stuff */
+    /* TODO: creawte a workspace widget for each individual workspace so that they can be redrawn individually (more efficent and modular) */
     for(row = 0; row < wswin->rows; row++)
     {
         for(col = 0; col < wswin->cols; col++)
@@ -222,6 +223,8 @@ wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
     gdouble alpha = WIN_ALPHA;
     gint border_radius = WIN_BORDER_RADIUS;
     gdouble degrees = 3.14 / 180.0;
+
+    g_print("exposing\n");
 
     screen = gtk_widget_get_screen(GTK_WIDGET(wsw));
     cr = gdk_cairo_create (wsw->window);
