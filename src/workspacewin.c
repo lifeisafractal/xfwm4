@@ -174,8 +174,8 @@ wswinDraw (WswinWidget *wsw)
 
             /* only draw if we are the current or previous work space */
             /* draw no matter what if we are not yet drawn */
-            if((wsw->undrawn == FALSE) && (current != wswin->selected) && (current != wswin->previous))
-                continue;
+            //if((wsw->undrawn == FALSE) && (current != wswin->selected) && (current != wswin->previous))
+            //    continue;
 
             /* Draw a filled rounded rectangle with an outline */
             gint top, bot, left, right;
@@ -341,7 +341,8 @@ wswinSetSelected (Wswin *wswin, gint new_ws)
         wsw = (WswinWidget *) wswin_list->data;
         if(new_ws < (wswin->count))
         {
-                wswinDraw(wsw);
+                //wswinDraw(wsw);
+                gtk_widget_queue_draw (GTK_WIDGET(wsw));
         }
     }
 
