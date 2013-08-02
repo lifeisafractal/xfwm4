@@ -387,17 +387,10 @@ handleKeyPress (DisplayInfo *display_info, XKeyEvent * ev)
                 workspaceSwitch (screen_info, screen_info->current_ws - 1, c, TRUE, ev->time);
                 break;
             case KEY_MOVE_UP_WORKSPACE:
-                workspaceMove (screen_info, -1, 0, c, ev->time);
-                break;
             case KEY_MOVE_DOWN_WORKSPACE:
-                workspaceMove (screen_info, 1, 0, c, ev->time);
-                break;
             case KEY_MOVE_LEFT_WORKSPACE:
-                workspaceMove (screen_info, 0, -1, c, ev->time);
-                break;
             case KEY_MOVE_RIGHT_WORKSPACE:
-                workspaceMove (screen_info, 0, 1, c, ev->time);
-                break;
+                workspaceSwitchInteractive(ev_screen_info, c, ev);
             case KEY_MOVE_WORKSPACE_1:
             case KEY_MOVE_WORKSPACE_2:
             case KEY_MOVE_WORKSPACE_3:

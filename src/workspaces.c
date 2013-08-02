@@ -191,6 +191,26 @@ static void handle_workspace_event(ScreenInfo * screen_info, Client * c, XKeyEve
     int key;
 
     key = myScreenGetKeyPressed(screen_info, ev);
+
+    if(c)
+    {
+        switch(key)
+        {
+            case KEY_MOVE_UP_WORKSPACE:
+                workspaceMove(screen_info, -1, 0, c, ev->time);
+                break;
+            case KEY_MOVE_DOWN_WORKSPACE:
+                workspaceMove(screen_info, 1, 0, c, ev->time);
+                break;
+            case KEY_MOVE_LEFT_WORKSPACE:
+                workspaceMove(screen_info, 0, -1, c, ev->time);
+                break;
+            case KEY_MOVE_RIGHT_WORKSPACE:
+                workspaceMove(screen_info, 0, 1, c, ev->time);
+                break;
+        }
+    }
+
     switch(key)
     {
         case KEY_UP_WORKSPACE:
@@ -217,6 +237,7 @@ workspaceSwitchFilter (XEvent * xevent, gpointer data)
     eventFilterStatus status;
     int key, modifiers;
     gboolean switching;
+    Client *c;
 
     TRACE ("entering workspaceSwitchFilter");
 
@@ -224,7 +245,11 @@ workspaceSwitchFilter (XEvent * xevent, gpointer data)
 
     screen_info = passdata->screen_info;
     display_info = screen_info->display_info;
-    modifiers = (screen_info->params->keys[KEY_LEFT_WORKSPACE].modifier |
+    modifiers = (screen_info->params->keys[KEY_MOVE_UP_WORKSPACE].modifier |
+                 screen_info->params->keys[KEY_MOVE_DOWN_WORKSPACE].modifier |
+                 screen_info->params->keys[KEY_MOVE_LEFT_WORKSPACE].modifier |
+                 screen_info->params->keys[KEY_MOVE_RIGHT_WORKSPACE].modifier |
+                 screen_info->params->keys[KEY_LEFT_WORKSPACE].modifier |
                  screen_info->params->keys[KEY_RIGHT_WORKSPACE].modifier |
                  screen_info->params->keys[KEY_UP_WORKSPACE].modifier |
                  screen_info->params->keys[KEY_DOWN_WORKSPACE].modifier);
@@ -239,6 +264,19 @@ workspaceSwitchFilter (XEvent * xevent, gpointer data)
     {
         case KeyPress:
             key = myScreenGetKeyPressed (screen_info, (XKeyEvent *) xevent);
+            c = clientGetFocus ();
+            if (c)
+            {
+                if (key == KEY_MOVE_UP_WORKSPACE |
+                    key == KEY_MOVE_DOWN_WORKSPACE |
+                    key == KEY_MOVE_LEFT_WORKSPACE |
+                    key == KEY_MOVE_RIGHT_WORKSPACE)
+                {
+                    handle_workspace_event (screen_info, c, (XKeyEvent *) xevent);
+                    wswinSetSelected (passdata->wswin, screen_info->current_ws);
+                }
+            }
+
             if (key == KEY_UP_WORKSPACE |
                 key == KEY_DOWN_WORKSPACE |
                 key == KEY_LEFT_WORKSPACE |
@@ -301,6 +339,10 @@ workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev
     key = myScreenGetKeyPressed (screen_info, ev);
     switch(key)
     {
+        case KEY_MOVE_UP_WORKSPACE:
+        case KEY_MOVE_DOWN_WORKSPACE:
+        case KEY_MOVE_LEFT_WORKSPACE:
+        case KEY_MOVE_RIGHT_WORKSPACE:
         case KEY_UP_WORKSPACE:
         case KEY_DOWN_WORKSPACE:
         case KEY_LEFT_WORKSPACE:
@@ -746,3 +788,4 @@ workspaceUpdateArea (ScreenInfo *screen_info)
         clientScreenResize(screen_info, FALSE);
     }
 }
+
