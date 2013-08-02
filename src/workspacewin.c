@@ -224,8 +224,6 @@ wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
     gint border_radius = WIN_BORDER_RADIUS;
     gdouble degrees = 3.14 / 180.0;
 
-    g_print("exposing\n");
-
     screen = gtk_widget_get_screen(GTK_WIDGET(wsw));
     cr = gdk_cairo_create (wsw->window);
     if (G_UNLIKELY (cr == NULL))
