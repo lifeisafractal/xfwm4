@@ -390,7 +390,7 @@ handleKeyPress (DisplayInfo *display_info, XKeyEvent * ev)
             case KEY_MOVE_DOWN_WORKSPACE:
             case KEY_MOVE_LEFT_WORKSPACE:
             case KEY_MOVE_RIGHT_WORKSPACE:
-                workspaceSwitchInteractive(ev_screen_info, c, ev);
+                workspaceSwitchInteractive (ev_screen_info, c, ev);
             case KEY_MOVE_WORKSPACE_1:
             case KEY_MOVE_WORKSPACE_2:
             case KEY_MOVE_WORKSPACE_3:
@@ -492,7 +492,7 @@ handleKeyPress (DisplayInfo *display_info, XKeyEvent * ev)
         case KEY_LEFT_WORKSPACE:
         case KEY_RIGHT_WORKSPACE:
             status = EVENT_FILTER_REMOVE;
-            workspaceSwitchInteractive(ev_screen_info, NULL, ev);
+            workspaceSwitchInteractive (ev_screen_info, NULL, ev);
             break;
         case KEY_ADD_WORKSPACE:
             status = EVENT_FILTER_REMOVE;

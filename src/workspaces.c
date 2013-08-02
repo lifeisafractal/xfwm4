@@ -186,27 +186,27 @@ modify_with_wrap (int value, int by, int limit, gboolean wrap)
     return value;
 }
 
-static void handle_workspace_event(ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
+static void handle_workspace_event (ScreenInfo * screen_info, Client * c, XKeyEvent * ev)
 {
     int key;
 
-    key = myScreenGetKeyPressed(screen_info, ev);
+    key = myScreenGetKeyPressed (screen_info, ev);
 
     if(c)
     {
         switch(key)
         {
             case KEY_MOVE_UP_WORKSPACE:
-                workspaceMove(screen_info, -1, 0, c, ev->time);
+                workspaceMove (screen_info, -1, 0, c, ev->time);
                 break;
             case KEY_MOVE_DOWN_WORKSPACE:
-                workspaceMove(screen_info, 1, 0, c, ev->time);
+                workspaceMove (screen_info, 1, 0, c, ev->time);
                 break;
             case KEY_MOVE_LEFT_WORKSPACE:
-                workspaceMove(screen_info, 0, -1, c, ev->time);
+                workspaceMove (screen_info, 0, -1, c, ev->time);
                 break;
             case KEY_MOVE_RIGHT_WORKSPACE:
-                workspaceMove(screen_info, 0, 1, c, ev->time);
+                workspaceMove (screen_info, 0, 1, c, ev->time);
                 break;
         }
     }
@@ -214,16 +214,16 @@ static void handle_workspace_event(ScreenInfo * screen_info, Client * c, XKeyEve
     switch(key)
     {
         case KEY_UP_WORKSPACE:
-            workspaceMove(screen_info, -1, 0, NULL, ev->time);
+            workspaceMove (screen_info, -1, 0, NULL, ev->time);
             break;
         case KEY_DOWN_WORKSPACE:
-            workspaceMove(screen_info, 1, 0, NULL, ev->time);
+            workspaceMove (screen_info, 1, 0, NULL, ev->time);
             break;
         case KEY_LEFT_WORKSPACE:
-            workspaceMove(screen_info, 0, -1, NULL, ev->time);
+            workspaceMove (screen_info, 0, -1, NULL, ev->time);
             break;
         case KEY_RIGHT_WORKSPACE:
-            workspaceMove(screen_info, 0, 1, NULL, ev->time);
+            workspaceMove (screen_info, 0, 1, NULL, ev->time);
             break;
     }
 }
@@ -282,8 +282,8 @@ workspaceSwitchFilter (XEvent * xevent, gpointer data)
                 key == KEY_LEFT_WORKSPACE |
                 key == KEY_RIGHT_WORKSPACE)
             {
-                handle_workspace_event(screen_info, NULL, (XKeyEvent *) xevent);
-                wswinSetSelected(passdata->wswin, screen_info->current_ws);
+                handle_workspace_event (screen_info, NULL, (XKeyEvent *) xevent);
+                wswinSetSelected (passdata->wswin, screen_info->current_ws);
             }
             /* If last key press event didn't have our modifiers pressed, finish workspace switching */
             if (!(xevent->xkey.state & modifiers))
@@ -337,7 +337,7 @@ workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev
 
     modifier = 0;
     key = myScreenGetKeyPressed (screen_info, ev);
-    switch(key)
+    switch (key)
     {
         case KEY_MOVE_UP_WORKSPACE:
         case KEY_MOVE_DOWN_WORKSPACE:
@@ -357,7 +357,7 @@ workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev
          * the cycle loop, and we already servied the event above
          * that's it...
          */
-        handle_workspace_event(screen_info, c, ev);
+        handle_workspace_event (screen_info, c, ev);
         return;
     }
 
@@ -375,7 +375,7 @@ workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev
         return;
     }
 
-    handle_workspace_event(screen_info, c, ev);
+    handle_workspace_event (screen_info, c, ev);
 
     passdata.c = NULL;
     passdata.screen_info = screen_info;
@@ -389,10 +389,10 @@ workspaceSwitchInteractive (ScreenInfo * screen_info, Client * c, XKeyEvent * ev
 
     TRACE("leaving workspace loop");
 
-    updateXserverTime(display_info);
+    updateXserverTime (display_info);
 
-    wswinDestroy(passdata.wswin);
-    g_free(passdata.wswin);
+    wswinDestroy (passdata.wswin);
+    g_free (passdata.wswin);
 
     myScreenUngrabKeyboard (screen_info, myDisplayGetCurrentTime (display_info));
     myScreenUngrabPointer (screen_info, myDisplayGetCurrentTime (display_info));
