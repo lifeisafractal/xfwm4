@@ -151,9 +151,6 @@ wswinDraw (WswinWidget *wsw)
     gboolean composited;
     gint row, col, current;
 
-    if (!(wsw->exposed))
-        return;
-
     cr = gdk_cairo_create (GTK_WIDGET(wsw)->window);
     if (G_UNLIKELY (cr == NULL))
       return;
@@ -265,8 +262,6 @@ wswin_expose (GtkWidget *wsw, GdkEventExpose *event, gpointer data)
 
     cairo_destroy (cr);
 
-    wswin->exposed = TRUE;
-
     wswinDraw(wswin);
 
     return FALSE;
@@ -286,7 +281,6 @@ wswinCreateWidget (Wswin *wswin, ScreenInfo *screen_info, gint monitor_num)
     wsw->monitor_num = monitor_num;
     wsw->wswin = wswin;
     wsw->undrawn = TRUE;
-    wsw->exposed = FALSE;
 
     gtk_window_set_screen (GTK_WINDOW (wsw), screen_info->gscr);
     /* TODO: give this its own name like "xfwm4-wswin" */

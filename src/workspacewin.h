@@ -60,6 +60,7 @@ struct _WswinWidget
 
     gint width, height;
     gboolean undrawn;
+    /* TODO: remove the exposed, its unneeded */
     gboolean exposed;
     gint monitor_num;
 };
